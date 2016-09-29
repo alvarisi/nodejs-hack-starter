@@ -4,51 +4,55 @@ var sonodaFacade = function() {};
 sonodaFacade.prototype = Object.create(require('events').EventEmitter.prototype);
 
 sonodaFacade.prototype.register = function(params) {
-  var mysql      = require('mysql');
-	var conf = require('./config.json');
-	var connection = mysql.createConnection(conf.mysql);
-	var self = this;
+    var mysql = require('mysql');
+    var conf = require('./config.json');
+    var connection = mysql.createConnection(conf.mysql);
+    var self = this;
 
-	connection.connect();
+    connection.connect();
 
-  var q = "insert into ws_personal_user values ("+params.user_id+", 0, 0, 0, 0, 0);";
+    var q = "insert into ws_personal_user values (" + params.user_id + ", 0, 0, 0, 0, 0);";
 
-  connection.query(q ,function(err, rows, fields) {
-    if (!err) {
-      self.success({ "success" : 1});
-    } else {
-      self.error(err);
-    }
-  });
+    connection.query(q, function(err, rows, fields) {
+        if (!err) {
+            self.success({
+                "success": 1
+            });
+        } else {
+            self.error(err);
+        }
+    });
 
-  connection.end();
+    connection.end();
 
 }
 
 sonodaFacade.prototype.impressionProduct = function(params) {
-    var mysql      = require('mysql');
+    var mysql = require('mysql');
     var conf = require('./config.json');
     var connection = mysql.createConnection(conf.mysql);
     var self = this;
-    var fieldName = 'dep_'+params.dep_id;
+    var fieldName = 'dep_' + params.dep_id;
 
     connection.connect();
 
-    var q = "select "+fieldName+" from ws_personal_user where user_id = "+params.user_id+";";
+    var q = "select " + fieldName + " from ws_personal_user where user_id = " + params.user_id + ";";
 
     console.log(q);
 
-    connection.query(q ,function(err, rows, fields) {
+    connection.query(q, function(err, rows, fields) {
         if (!err) {
             console.log('The solution is: ', rows);
             var score = rows[0][fieldName];
             score = score + 1;
 
-            var q = "update ws_personal_user set "+fieldName+" = "+score+" where user_id = "+params.user_id+";";
+            var q = "update ws_personal_user set " + fieldName + " = " + score + " where user_id = " + params.user_id + ";";
             console.log(q);
-            connection.query(q ,function(err, rows, fields) {
+            connection.query(q, function(err, rows, fields) {
                 if (!err) {
-                    self.success({ "success" : 1});
+                    self.success({
+                        "success": 1
+                    });
                 } else {
                     self.error(err);
                 }
@@ -64,29 +68,31 @@ sonodaFacade.prototype.impressionProduct = function(params) {
 }
 
 sonodaFacade.prototype.clickProduct = function(params) {
-    var mysql      = require('mysql');
+    var mysql = require('mysql');
     var conf = require('./config.json');
     var connection = mysql.createConnection(conf.mysql);
     var self = this;
-    var fieldName = 'dep_'+params.dep_id;
+    var fieldName = 'dep_' + params.dep_id;
 
     connection.connect();
 
-    var q = "select "+fieldName+" from ws_personal_user where user_id = "+params.user_id+";";
+    var q = "select " + fieldName + " from ws_personal_user where user_id = " + params.user_id + ";";
 
     console.log(q);
 
-    connection.query(q ,function(err, rows, fields) {
+    connection.query(q, function(err, rows, fields) {
         if (!err) {
             console.log('The solution is: ', rows);
             var score = rows[0][fieldName];
             score = score + 10;
 
-            var q = "update ws_personal_user set "+fieldName+" = "+score+" where user_id = "+params.user_id+";";
+            var q = "update ws_personal_user set " + fieldName + " = " + score + " where user_id = " + params.user_id + ";";
             console.log(q);
-            connection.query(q ,function(err, rows, fields) {
+            connection.query(q, function(err, rows, fields) {
                 if (!err) {
-                    self.success({ "success" : 1});
+                    self.success({
+                        "success": 1
+                    });
                 } else {
                     self.error(err);
                 }
@@ -113,15 +119,150 @@ sonodaFacade.prototype.getProductList = function(params) {
 }
 
 sonodaFacade.prototype.success = function(res) {
-  console.log('success!  '+res);
-  this.emit('success', res);
-  return;
+    console.log('success!  ' + res);
+    this.emit('success', res);
+    return;
 }
 
 sonodaFacade.prototype.error = function(err) {
-  console.log('error '+err);
-  this.emit('error', err);
-  return;
+    console.log('error ' + err);
+    this.emit('error', err);
+    return;
+}
+
+sonodaFacade.prototype.regiterMerchant = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.regiterMerchant(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.registrasiTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.registrasiTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.infoSaldoTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.infoSaldoTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.inquiryBelanjaTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.inquiryBelanjaTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.requestTokenTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.requestTokenTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.topUpTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.topUpTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.transferTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.transferTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.belanjaTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.belanjaTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
+}
+
+sonodaFacade.prototype.gantiPINTBank = function(params) {
+    var sonodaCore = require('./sonoda-core.js');
+    var self = this;
+
+    sonodaCore.gantiPINTBank(params);
+
+    sonodaCore.on("success", function(response) {
+        self.success(response);
+    });
+
+    sonodaCore.on("error", function(err) {
+        self.error(err);
+    });
 }
 
 module.exports = new sonodaFacade();
